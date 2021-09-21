@@ -538,6 +538,65 @@ func TestAddServiceWithoutImage(t *testing.T) {
 	}
 }
 
+func TestAddServiceWithoutGitRepoUrl(t *testing.T) {
+	fakeFs := ioutils.NewMemoryFilesystem()
+	m := buildManifest(false, false)
+	want := res.Resources{
+		"environments/test-dev/apps/new-app/base/kustomization.yaml":     &res.Kustomization{Bases: []string{"../services/test"}},
+		"environments/test-dev/apps/new-app/overlays/kustomization.yaml": &res.Kustomization{Bases: []string{"../base"}},
+		"environments/test-dev/apps/new-app/kustomization.yaml": &res.Kustomization{
+			Bases:        []string{"overlays"},
+			CommonLabels: map[string]string{"app.openshift.io/vcs-source": "org/test"},
+		},
+		"environments/test-dev/apps/new-app/services/test/base/kustomization.yaml":          &res.Kustomization{Bases: []string{"./config"}},
+		"environments/test-dev/apps/new-app/services/test/kustomization.yaml":               &res.Kustomization{Bases: []string{"overlays"}},
+		"environments/test-dev/apps/new-app/services/test/overlays/kustomization.yaml":      &res.Kustomization{Bases: []string{"../base"}},
+		"environments/cicd/base/pipelines/03-secrets/webhook-secret-test-dev-test-svc.yaml": nil,
+		"pipelines.yaml": &config.Manifest{
+			GitOpsURL: "http://github.com/org/test",
+			Environments: []*config.Environment{
+				{
+					Name: "test-dev",
+					Apps: []*config.Application{
+						{
+							Name: "test-app",
+							Services: []*config.Service{
+								{
+									Name:      "test-svc",
+									SourceURL: "https://github.com/myproject/test-svc",
+								},
+							},
+						},
+						{
+							Name: "new-app",
+							Services: []*config.Service{
+								{Name: "test"},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	got, otherResources, err := serviceResources(m, fakeFs, &AddServiceOptions{
+		AppName:             "new-app",
+		EnvName:             "test-dev",
+		PipelinesFolderPath: pipelinesFile,
+		WebhookSecret:       "123",
+		ServiceName:         "test",
+	})
+	assertNoError(t, err)
+	for i := range want {
+		if diff := cmp.Diff(want[i], got[i]); diff != "" {
+			t.Fatalf("serviceResources() failed: %v", diff)
+		}
+	}
+	if diff := cmp.Diff(0, len(otherResources)); diff != "" {
+		t.Fatalf("other resources is not empty:\n%s", diff)
+	}
+}
+
 func buildManifest(withPipelines, withArgoCD bool) *config.Manifest {
 	m := config.Manifest{
 		GitOpsURL: "http://github.com/org/test",

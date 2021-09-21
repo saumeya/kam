@@ -86,34 +86,35 @@ func serviceResources(m *config.Manifest, appFs afero.Fs, o *AddServiceOptions) 
 
 	// add the secret only if CI/CD env is present
 	if cfg != nil {
-		secretName := secrets.MakeServiceWebhookSecretName(o.EnvName, svc.Name)
-		var opaqueSecret *corev1.Secret
-		var err error
-		opaqueSecret, err = secrets.CreateUnsealedSecret(
-			meta.NamespacedName(cfg.Name, secretName), o.WebhookSecret,
-			eventlisteners.WebhookSecretKey)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		svc.Webhook = &config.Webhook{
-			Secret: &config.Secret{
-				Name:      secretName,
-				Namespace: cfg.Name,
-			},
-		}
-		secretFilename := filepath.ToSlash(filepath.Join("secrets", secretName+".yaml"))
-		otherResources[secretFilename] = opaqueSecret
-
-		if m.Config.Pipelines != nil {
-			// add the default pipelines if they're absent
-			if env.Pipelines == nil {
-				repo, err := scm.NewRepository(m.GitOpsURL)
-				if err != nil {
-					return nil, nil, err
-				}
-				env.Pipelines = defaultPipelines(repo)
+		// add the default pipelines if they're absent
+		if env.Pipelines == nil {
+			repo, err := scm.NewRepository(m.GitOpsURL)
+			if err != nil {
+				return nil, nil, err
 			}
+			env.Pipelines = defaultPipelines(repo)
+		}
+
+		if o.GitRepoURL != "" {
+			// create webhook secret
+			secretName := secrets.MakeServiceWebhookSecretName(o.EnvName, svc.Name)
+			var opaqueSecret *corev1.Secret
+			var err error
+			opaqueSecret, err = secrets.CreateUnsealedSecret(
+				meta.NamespacedName(cfg.Name, secretName), o.WebhookSecret,
+				eventlisteners.WebhookSecretKey)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			svc.Webhook = &config.Webhook{
+				Secret: &config.Secret{
+					Name:      secretName,
+					Namespace: cfg.Name,
+				},
+			}
+			secretFilename := filepath.ToSlash(filepath.Join("secrets", secretName+".yaml"))
+			otherResources[secretFilename] = opaqueSecret
 
 			// use internal registry if no input image registry is provided
 			if o.ImageRepo == "" {
