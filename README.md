@@ -1,6 +1,14 @@
 # GitOps Application Manager
 
-The GitOps Application Manager provides command line interface to bootstrap GitOps and perform other operations.  See why and how [GitOps for Application Delivery](./docs/README.md) can help your business streamline your application delivery.
+The GitOps Application Manager provides command line interface to bootstrap GitOps and perform other operations. See why and how [GitOps for Application Delivery](./docs/README.md) can help your business streamline your application delivery.
+
+## Support Matrix
+
+|                                  KAM                                   | OpenShift | OpenShift GitOps | OpenShift Pipelines |
+| :--------------------------------------------------------------------: | :-------: | :--------------: | :-----------------: |
+|                           0.0.40 (Oct 14th)                            |    4.9    |       1.3        |  1.6.x (Oct 20th)   |
+| [0.0.39](https://github.com/redhat-developer/kam/releases/tag/v0.0.39) |    4.8    |      1.2.1       |        1.5.x        |
+| [0.0.38](https://github.com/redhat-developer/kam/releases/tag/v0.0.38) |    4.7    |      1.2.0       |        1.4.x        |
 
 ## CLI Reference
 
@@ -9,10 +17,9 @@ The GitOps Application Manager provides command line interface to bootstrap GitO
 ## Getting Started
 
 ### GitOps Day 1 and Day 2 operations
-* [Day 1 Operations](docs/journey/day1): Install the prerequisites and setup your GitOps pipeline.
-* [Day 2 Operations](docs/journey/day2): Continue adding more applications.
-  
 
+- [Day 1 Operations](docs/journey/day1): Install the prerequisites and setup your GitOps pipeline.
+- [Day 2 Operations](docs/journey/day2): Continue adding more applications.
 
 Please visit the CLI [user documentation](./docs/README.md) to try out the CLI. For more information regarding how kam CLI is used, please refer to this [blog](https://developers.redhat.com/articles/2021/07/21/bootstrap-gitops-red-hat-openshift-pipelines-and-kam-cli).
 
