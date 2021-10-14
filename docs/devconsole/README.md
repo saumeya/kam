@@ -29,4 +29,8 @@ Visualize your GitOps environment stages and applications on DevConsole in OpenS
 
 ![GitOps Details Page](./img/GitOps_App_Details.png)
 
+9. Hover over the icons on the right of a resource to see it's health status and sync status. Only when a resource is out of sync or/and not healthy the corresponding icon is displayed.
+
+![GitOps Details Page - Resources](./img/GitOps_4.9_Details_Resources.png)
+
 Follow [Day 2 Operations](../journey/day2) to add more environments and applications to your GitOps workflow.
