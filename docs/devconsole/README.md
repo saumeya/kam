@@ -34,3 +34,26 @@ Visualize your GitOps environment stages and applications on DevConsole in OpenS
 ![GitOps Details Page - Resources](./img/GitOps_4.9_Details_Resources.png)
 
 Follow [Day 2 Operations](../journey/day2) to add more environments and applications to your GitOps workflow.
+
+## Contribution and developing locally
+
+1. Create a cluster route file `cluster-route.yaml` and add the following route to it
+```
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: cluster
+  namespace: openshift-gitops  
+spec: 
+  to: 
+    kind: Service
+    name: cluster   
+  port:
+    targetPort: 8080
+  tls:
+    termination: reencrypt
+    insecureEdgeTerminationPolicy: Allow
+```    
+2. Run `oc apply -f cluster-route.yaml` this will create a route that connects to the backend
+
+3. Now continue to locally run dev console 
